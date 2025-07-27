@@ -1,20 +1,18 @@
 import argparse
 import math
 from textwrap import dedent
-from typing import Tuple, List
 
 import ezdxf
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.axes import Axes
-from matplotlib.figure import Figure
+from matplotlib.backends.backend_pdf import PdfPages
 
 
 def draw_entities(
     entities: ezdxf.layouts.Layout,
     ax: Axes,
-    entities_to_draw: List[str],
+    entities_to_draw: list[str],
 ) -> None:
     """Draw DXF entities on matplotlib axes"""
     for e in entities:
@@ -134,7 +132,9 @@ def draw_entities(
             continue
 
 
-def add_crop_marks(ax: Axes, xlim: Tuple[float, float], ylim: Tuple[float, float], mark_len: float = 5) -> None:
+def add_crop_marks(
+    ax: Axes, xlim: tuple[float, float], ylim: tuple[float, float], mark_len: float = 5
+) -> None:
     """Draw crop marks at the corners of the printable region"""
     x0, x1 = xlim
     y0, y1 = ylim
@@ -152,7 +152,9 @@ def add_crop_marks(ax: Axes, xlim: Tuple[float, float], ylim: Tuple[float, float
     ax.plot([x1, x1], [y1 - mark_len, y1], color="gray", linewidth=0.5)
 
 
-def calculate_bounding_box(msp: ezdxf.layouts.Layout) -> Tuple[float, float, float, float]:
+def calculate_bounding_box(
+    msp: ezdxf.layouts.Layout,
+) -> tuple[float, float, float, float]:
     """Calculate bounding box manually for older ezdxf versions"""
     min_x = float("inf")
     min_y = float("inf")
@@ -194,7 +196,9 @@ def calculate_bounding_box(msp: ezdxf.layouts.Layout) -> Tuple[float, float, flo
                 arc_max_y = max(start_y, end_y)
 
                 # Check if arc includes extreme points (0°, 90°, 180°, 270°)
-                def angle_in_arc(angle: float, start_deg: float, end_deg: float) -> bool:
+                def angle_in_arc(
+                    angle: float, start_deg: float, end_deg: float
+                ) -> bool:
                     if start_deg <= end_deg:
                         return start_deg <= angle <= end_deg
                     else:  # Arc crosses 0°
@@ -261,10 +265,10 @@ def calculate_bounding_box(msp: ezdxf.layouts.Layout) -> Tuple[float, float, flo
 def dxf_to_pdf_tiled(
     dxf_path: str,
     pdf_path: str,
-    entities_to_draw: List[str],
-    paper_size_mm: Tuple[float, float] = (210, 297),
+    entities_to_draw: list[str],
+    paper_size_mm: tuple[float, float] = (210, 297),
     margin_mm: float = 10,
-    add_marks: bool = True
+    add_marks: bool = True,
 ) -> None:
     doc = ezdxf.readfile(dxf_path)
     msp = doc.modelspace()
@@ -318,11 +322,7 @@ def dxf_to_pdf_tiled(
                 ax.set_aspect("equal")
                 ax.axis("off")
 
-                draw_entities(
-                    entities=msp,
-                    ax=ax,
-                    entities_to_draw=entities_to_draw
-                )
+                draw_entities(entities=msp, ax=ax, entities_to_draw=entities_to_draw)
                 if add_marks:
                     add_crop_marks(ax, (x0, x1), (y0, y1))
 
@@ -332,7 +332,7 @@ def dxf_to_pdf_tiled(
     print(f"✅ Saved multi-page PDF with tiling to: {pdf_path}")
 
 
-def parse_paper_size(size_str: str) -> Tuple[float, float]:
+def parse_paper_size(size_str: str) -> tuple[float, float]:
     """Parse paper size string like '210,297' or 'A4' into (width, height) in mm"""
     # Common paper sizes
     paper_sizes = {
